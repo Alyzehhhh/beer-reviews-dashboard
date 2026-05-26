@@ -461,7 +461,7 @@ with col_l:
     plt.close(fig)
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Bubble chart (Plotly)
+# Bubble chart (matplotlib)
 st.markdown('<div class="chart-container">', unsafe_allow_html=True)
 fig = plot_bubble(filtered_df)
 st.pyplot(fig, width="stretch")
@@ -531,7 +531,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('<div class="pink-divider"></div>', unsafe_allow_html=True)
 st.markdown("""
 <div class="footer">
-    🍺 World Wide Beer Reviews Dashboard &nbsp;|&nbsp; Built with Python, Streamlit, Matplotlib, Seaborn & Plotly<br>
+    🍺 World Wide Beer Reviews Dashboard &nbsp;|&nbsp; Built with Python, Streamlit, Matplotlib & Seaborn<br>
     Data Source: BeerAdvocate (1.5M Reviews)
 </div>
 """, unsafe_allow_html=True)

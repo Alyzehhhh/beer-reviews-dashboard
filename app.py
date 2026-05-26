@@ -479,14 +479,14 @@ _col_map = {
     "review_aroma": "Aroma",
 }
 avail = [c for c in _col_map if c in filtered_df.columns]
-data_display = filtered_df[avail].rename(columns={c: _col_map[c] for c in avail}).head(500).reset_index(drop=True)
+data_display = filtered_df[avail].rename(columns={c: _col_map[c] for c in avail}).head(200).reset_index(drop=True)
 
 st.markdown('<div class="chart-container">', unsafe_allow_html=True)
 st.markdown(
     f'<p style="font-family:Poppins,sans-serif;font-size:0.82rem;margin-bottom:6px;">'
     f'<span style="background:linear-gradient(135deg,#FF4D8D,#A855F7);-webkit-background-clip:text;'
     f'-webkit-text-fill-color:transparent;font-weight:700;">{len(filtered_df):,}</span>'
-    f' <span style="color:#8B7AA0;">total reviews &middot; showing first 500 rows</span></p>',
+    f' <span style="color:#8B7AA0;">total reviews &middot; showing first 200 rows</span></p>',
     unsafe_allow_html=True,
 )
 

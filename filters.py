@@ -90,9 +90,9 @@ def load_data():
     if drop_cols:
         df.drop(columns=drop_cols, inplace=True)
 
-    # Sample for performance — 15K keeps memory safe under 512MB free tier
-    if len(df) > 15_000:
-        df = df.sample(n=15_000, random_state=42).reset_index(drop=True)
+    # Sample for performance — 10K keeps memory safe under 512MB free tier
+    if len(df) > 10_000:
+        df = df.sample(n=10_000, random_state=42).reset_index(drop=True)
     gc.collect()
 
     return df

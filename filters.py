@@ -82,14 +82,14 @@ def load_data():
     # Drop heavy column we no longer need
     df.drop(columns=["review_time"], inplace=True)
 
-    # Drop columns we don't need to save memory
-    drop_cols = [c for c in ["review_profilename", "beer_beerid", "brewery_id"] if c in df.columns]
+    # Drop columns we don't need to save memory (keep beer_beerid — used by bubble chart)
+    drop_cols = [c for c in ["review_profilename", "brewery_id"] if c in df.columns]
     if drop_cols:
         df.drop(columns=drop_cols, inplace=True)
 
-    # Sample for performance — 80K keeps memory under 512MB on free tier
-    if len(df) > 80_000:
-        df = df.sample(n=80_000, random_state=42).reset_index(drop=True)
+    # Sample for performance — 50K keeps memory safe under 512MB free tier
+    if len(df) > 50_000:
+        df = df.sample(n=50_000, random_state=42).reset_index(drop=True)
 
     return df
 

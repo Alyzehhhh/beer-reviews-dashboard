@@ -9,8 +9,7 @@ import matplotlib.colors as mcolors
 import seaborn as sns
 import numpy as np
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
+# plotly removed to save ~100MB RAM on free tier
 
 # ── Glossy Vibrant Palette ──
 C1 = "#FF4D8D"   # hot pink
@@ -124,7 +123,7 @@ def plot_bar_chart(df):
 
 # ── 5. SCATTER ──
 def plot_scatter(df):
-    s = df.sample(n=min(3000, len(df)), random_state=42)
+    s = df.sample(n=min(1500, len(df)), random_state=42)
     fig, ax = plt.subplots(figsize=(8, 5))
     sc = ax.scatter(s["beer_abv"], s["review_overall"], c=s["review_taste"],
                     cmap="cool", alpha=0.55, s=18, edgecolors="white", linewidths=0.3)
@@ -229,8 +228,8 @@ def plot_violin(df):
 
 # ── BONUS 1: PAIR PLOT ──
 def plot_pair(df):
-    s = df.sample(n=min(800, len(df)), random_state=42)
-    cols = ["review_overall", "review_aroma", "review_appearance", "review_palate", "review_taste"]
+    s = df.sample(n=min(300, len(df)), random_state=42)
+    cols = ["review_overall", "review_aroma", "review_taste"]
     g = sns.pairplot(
         s[cols], diag_kind="kde",
         plot_kws=dict(alpha=0.3, s=8, color=C6, edgecolor="white", linewidth=0.1),
@@ -249,19 +248,27 @@ def plot_bubble(df):
         beers=("beer_beerid", "nunique"),
     ).reset_index()
     brew = brew[brew["cnt"] >= 30].nlargest(40, "cnt")
-    fig = px.scatter(
-        brew, x="avg", y="cnt", size="beers",
-        hover_name="brewery_name", color="avg",
-        color_continuous_scale=["#36D1DC", "#FF4D8D", "#A855F7"],
-        size_max=50,
-        labels={"avg": "Average Rating", "cnt": "Total Reviews", "beers": "Beers"},
-        title="Breweries — Rating vs Popularity",
+    fig, ax = plt.subplots(figsize=(10, 6))
+    fig.patch.set_facecolor(BG)
+    ax.set_facecolor(BG)
+    sizes = (brew["beers"] / brew["beers"].max() * 400).clip(lower=20)
+    scatter = ax.scatter(
+        brew["avg"], brew["cnt"], s=sizes, c=brew["avg"],
+        cmap=mcolors.LinearSegmentedColormap.from_list("", ["#36D1DC", "#FF4D8D", "#A855F7"]),
+        alpha=0.75, edgecolors="white", linewidth=0.8,
     )
-    fig.update_layout(
-        plot_bgcolor=BG, paper_bgcolor=BG,
-        font=dict(color=TEXT, family="serif"), title_font_size=16,
-    )
-    fig.update_traces(marker=dict(line=dict(width=1, color="white")))
+    ax.set_xlabel("Average Rating", color=TEXT, fontfamily="serif")
+    ax.set_ylabel("Total Reviews", color=TEXT, fontfamily="serif")
+    ax.set_title("Breweries — Rating vs Popularity", fontsize=14, fontweight="bold",
+                 color=TEXT, fontfamily="serif")
+    ax.tick_params(colors=GRID)
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+    ax.grid(True, alpha=0.15, color=GRID)
+    cb = fig.colorbar(scatter, ax=ax, pad=0.02)
+    cb.set_label("Avg Rating", color=TEXT)
+    cb.ax.tick_params(colors=GRID)
+    fig.tight_layout()
     return fig
 
 

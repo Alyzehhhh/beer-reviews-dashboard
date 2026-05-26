@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 import os
+import gc
 
 # Column dtypes to speed up read_csv (~40% faster than auto-detect)
 _DTYPES = {
@@ -49,15 +50,17 @@ def load_data():
         )
         st.stop()
 
-    # Read in chunks to limit peak memory on free-tier (512MB)
+    # Read in small chunks to limit peak memory on free-tier (512MB)
     chunks = []
     total_rows = 0
-    for chunk in pd.read_csv(read_path, dtype=_DTYPES, chunksize=200_000):
+    for chunk in pd.read_csv(read_path, dtype=_DTYPES, chunksize=100_000):
         total_rows += len(chunk)
-        chunks.append(chunk.sample(n=min(20_000, len(chunk)), random_state=42))
+        chunks.append(chunk.sample(n=min(5_000, len(chunk)), random_state=42))
         del chunk
+        gc.collect()
     df = pd.concat(chunks, ignore_index=True)
     del chunks
+    gc.collect()
 
     # Quick fills
     df["brewery_name"] = df["brewery_name"].fillna("Unknown")
@@ -87,9 +90,10 @@ def load_data():
     if drop_cols:
         df.drop(columns=drop_cols, inplace=True)
 
-    # Sample for performance — 50K keeps memory safe under 512MB free tier
-    if len(df) > 50_000:
-        df = df.sample(n=50_000, random_state=42).reset_index(drop=True)
+    # Sample for performance — 25K keeps memory safe under 512MB free tier
+    if len(df) > 25_000:
+        df = df.sample(n=25_000, random_state=42).reset_index(drop=True)
+    gc.collect()
 
     return df
 

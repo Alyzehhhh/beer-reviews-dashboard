@@ -4,6 +4,7 @@ Vibrant glassmorphism design with shimmer accents.
 """
 
 import streamlit as st
+import gc
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -396,6 +397,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
+gc.collect()
 # ══════════════════════════════════════════════════════════════════
 # SECTION 3: RATINGS & COMPARISONS
 # ══════════════════════════════════════════════════════════════════
@@ -417,6 +419,7 @@ with col_h:
     st.markdown('</div>', unsafe_allow_html=True)
 
 
+gc.collect()
 # ══════════════════════════════════════════════════════════════════
 # SECTION 4: RELATIONSHIPS & DEEP DIVE
 # ══════════════════════════════════════════════════════════════════
@@ -461,7 +464,8 @@ with col_l:
 # Bubble chart (Plotly)
 st.markdown('<div class="chart-container">', unsafe_allow_html=True)
 fig = plot_bubble(filtered_df)
-st.plotly_chart(fig, width="stretch")
+st.pyplot(fig, width="stretch")
+plt.close(fig)
 st.markdown('</div>', unsafe_allow_html=True)
 
 

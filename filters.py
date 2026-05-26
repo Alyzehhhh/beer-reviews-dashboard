@@ -28,26 +28,36 @@ _DTYPES = {
 
 @st.cache_data(show_spinner="Loading beer data...")
 def load_data():
-    """Load, clean, and sample the beer reviews dataset."""
-    import gzip, shutil
+    """Load, clean, and sample the beer reviews dataset.
+    Memory-optimized: reads .gz directly, samples early to stay under 512MB RAM.
+    """
     data_dir = os.path.join(os.path.dirname(__file__), "data")
     data_path = os.path.join(data_dir, "beer_reviews.csv")
     gz_path = os.path.join(data_dir, "beer_reviews.csv.gz")
 
-    # Auto-decompress if only .gz exists (Render / fresh clone)
-    if not os.path.exists(data_path) and os.path.exists(gz_path):
-        with gzip.open(gz_path, "rb") as f_in, open(data_path, "wb") as f_out:
-            shutil.copyfileobj(f_in, f_out)
-
-    if not os.path.exists(data_path):
+    # Prefer reading .gz directly (avoids decompressing 172MB to disk)
+    if os.path.exists(gz_path):
+        read_path = gz_path
+    elif os.path.exists(data_path):
+        read_path = data_path
+    else:
         st.error(
             f"**Dataset not found!**\n\n"
-            f"Expected at: `{data_path}`\n\n"
+            f"Expected at: `{data_path}` or `{gz_path}`\n\n"
             f"Please download `beer_reviews.csv` from the BeerAdvocate dataset "
             f"and place it in the `data/` folder next to `app.py`."
         )
         st.stop()
-    df = pd.read_csv(data_path, dtype=_DTYPES)
+
+    # Read in chunks to limit peak memory on free-tier (512MB)
+    chunks = []
+    total_rows = 0
+    for chunk in pd.read_csv(read_path, dtype=_DTYPES, chunksize=200_000):
+        total_rows += len(chunk)
+        chunks.append(chunk.sample(n=min(20_000, len(chunk)), random_state=42))
+        del chunk
+    df = pd.concat(chunks, ignore_index=True)
+    del chunks
 
     # Quick fills
     df["brewery_name"] = df["brewery_name"].fillna("Unknown")
@@ -72,9 +82,14 @@ def load_data():
     # Drop heavy column we no longer need
     df.drop(columns=["review_time"], inplace=True)
 
-    # Sample for performance — 100K is plenty for all chart types
-    if len(df) > 100_000:
-        df = df.sample(n=100_000, random_state=42).reset_index(drop=True)
+    # Drop columns we don't need to save memory
+    drop_cols = [c for c in ["review_profilename", "beer_beerid", "brewery_id"] if c in df.columns]
+    if drop_cols:
+        df.drop(columns=drop_cols, inplace=True)
+
+    # Sample for performance — 80K keeps memory under 512MB on free tier
+    if len(df) > 80_000:
+        df = df.sample(n=80_000, random_state=42).reset_index(drop=True)
 
     return df
 

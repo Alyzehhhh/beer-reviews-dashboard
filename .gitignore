@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+*.png
+!data/
+.streamlit/secrets.toml
+data/beer_reviews.csv

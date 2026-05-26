@@ -55,7 +55,7 @@ def load_data():
     total_rows = 0
     for chunk in pd.read_csv(read_path, dtype=_DTYPES, chunksize=100_000):
         total_rows += len(chunk)
-        chunks.append(chunk.sample(n=min(5_000, len(chunk)), random_state=42))
+        chunks.append(chunk.sample(n=min(3_000, len(chunk)), random_state=42))
         del chunk
         gc.collect()
     df = pd.concat(chunks, ignore_index=True)
@@ -82,17 +82,17 @@ def load_data():
          + df["review_taste"] + df["review_overall"]) / 5
     ).astype("float32")
 
-    # Drop heavy column we no longer need
+    # Drop heavy columns we no longer need
     df.drop(columns=["review_time"], inplace=True)
 
-    # Drop columns we don't need to save memory (keep beer_beerid — used by bubble chart)
-    drop_cols = [c for c in ["review_profilename", "brewery_id"] if c in df.columns]
+    # Drop columns we don't need to save memory
+    drop_cols = [c for c in ["review_profilename", "brewery_id", "beer_beerid"] if c in df.columns]
     if drop_cols:
         df.drop(columns=drop_cols, inplace=True)
 
-    # Sample for performance — 25K keeps memory safe under 512MB free tier
-    if len(df) > 25_000:
-        df = df.sample(n=25_000, random_state=42).reset_index(drop=True)
+    # Sample for performance — 15K keeps memory safe under 512MB free tier
+    if len(df) > 15_000:
+        df = df.sample(n=15_000, random_state=42).reset_index(drop=True)
     gc.collect()
 
     return df

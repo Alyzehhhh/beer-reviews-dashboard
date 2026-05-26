@@ -12,7 +12,7 @@ from filters import load_data, setup_sidebar_filters, get_kpi_data, get_full_cou
 from charts import (
     plot_pie_chart, plot_histogram, plot_line_chart, plot_bar_chart,
     plot_scatter, plot_box, plot_heatmap, plot_area_chart, plot_count,
-    plot_violin, plot_pair, plot_bubble, plot_stacked_bar, plot_donut,
+    plot_violin, plot_stacked_bar, plot_donut,
 )
 
 st.set_page_config(
@@ -461,30 +461,7 @@ with col_l:
     plt.close(fig)
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Bubble chart (matplotlib)
-st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-fig = plot_bubble(filtered_df)
-st.pyplot(fig, width="stretch")
-plt.close(fig)
-st.markdown('</div>', unsafe_allow_html=True)
-
-
-# ══════════════════════════════════════════════════════════════════
-# SECTION 5: MULTI-DIMENSION ANALYSIS
-# ══════════════════════════════════════════════════════════════════
-st.markdown('<div class="section-header">🎯 Multi-Dimension Analysis</div>', unsafe_allow_html=True)
-
-st.markdown("""
-<div class="insight-box">
-    This pair plot reveals how all five rating dimensions relate. Notice the tight clusters — most reviewers rate all dimensions similarly.
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-fig = plot_pair(filtered_df)
-st.pyplot(fig, width="stretch")
-plt.close(fig)
-st.markdown('</div>', unsafe_allow_html=True)
+gc.collect()
 
 
 # ══════════════════════════════════════════════════════════════════

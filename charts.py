@@ -123,7 +123,7 @@ def plot_bar_chart(df):
 
 # ── 5. SCATTER ──
 def plot_scatter(df):
-    s = df.sample(n=min(1500, len(df)), random_state=42)
+    s = df.sample(n=min(800, len(df)), random_state=42)
     fig, ax = plt.subplots(figsize=(8, 5))
     sc = ax.scatter(s["beer_abv"], s["review_overall"], c=s["review_taste"],
                     cmap="cool", alpha=0.55, s=18, edgecolors="white", linewidths=0.3)

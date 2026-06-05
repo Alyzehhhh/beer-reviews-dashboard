@@ -327,6 +327,26 @@ if filters_active:
         unsafe_allow_html=True,
     )
 
+# ── Empty / too-small data guard ──────────────────────────────────
+# When filters narrow results to (near) zero, charts get NaN axis limits
+# and crash the page. Stop early with a friendly message instead.
+if len(filtered_df) < 5:
+    st.warning(
+        "🔍 **No reviews match these filters** (or too few to chart). "
+        "Try widening your filters or click **🔄 Reset All Filters** in the sidebar."
+    )
+    st.stop()
+
+
+def safe_chart(plot_fn, data):
+    """Render a chart, but never let one broken chart crash the whole page."""
+    try:
+        fig = plot_fn(data)
+        st.pyplot(fig, width="stretch")
+        plt.close(fig)
+    except Exception:
+        st.info("Not enough data to render this chart for the current filters.")
+
 
 # ══════════════════════════════════════════════════════════════════
 # SECTION 1: DISTRIBUTION & COMPOSITION
@@ -336,16 +356,12 @@ st.markdown('<div class="section-header">📊 Distribution & Composition</div>',
 col_a, col_b = st.columns(2)
 with col_a:
     st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    fig = plot_pie_chart(filtered_df)
-    st.pyplot(fig, width="stretch")
-    plt.close(fig)
+    safe_chart(plot_pie_chart, filtered_df)
     st.markdown('</div>', unsafe_allow_html=True)
 
 with col_b:
     st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    fig = plot_donut(filtered_df)
-    st.pyplot(fig, width="stretch")
-    plt.close(fig)
+    safe_chart(plot_donut, filtered_df)
     st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("""
@@ -357,16 +373,12 @@ st.markdown("""
 col_c, col_d = st.columns(2)
 with col_c:
     st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    fig = plot_histogram(filtered_df)
-    st.pyplot(fig, width="stretch")
-    plt.close(fig)
+    safe_chart(plot_histogram, filtered_df)
     st.markdown('</div>', unsafe_allow_html=True)
 
 with col_d:
     st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    fig = plot_count(filtered_df)
-    st.pyplot(fig, width="stretch")
-    plt.close(fig)
+    safe_chart(plot_count, filtered_df)
     st.markdown('</div>', unsafe_allow_html=True)
 
 
@@ -378,16 +390,12 @@ st.markdown('<div class="section-header">📈 Trends Over Time</div>', unsafe_al
 col_e, col_f = st.columns(2)
 with col_e:
     st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    fig = plot_line_chart(filtered_df)
-    st.pyplot(fig, width="stretch")
-    plt.close(fig)
+    safe_chart(plot_line_chart, filtered_df)
     st.markdown('</div>', unsafe_allow_html=True)
 
 with col_f:
     st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    fig = plot_area_chart(filtered_df)
-    st.pyplot(fig, width="stretch")
-    plt.close(fig)
+    safe_chart(plot_area_chart, filtered_df)
     st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("""
@@ -406,16 +414,12 @@ st.markdown('<div class="section-header">⭐ Ratings & Comparisons</div>', unsaf
 col_g, col_h = st.columns(2)
 with col_g:
     st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    fig = plot_bar_chart(filtered_df)
-    st.pyplot(fig, width="stretch")
-    plt.close(fig)
+    safe_chart(plot_bar_chart, filtered_df)
     st.markdown('</div>', unsafe_allow_html=True)
 
 with col_h:
     st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    fig = plot_stacked_bar(filtered_df)
-    st.pyplot(fig, width="stretch")
-    plt.close(fig)
+    safe_chart(plot_stacked_bar, filtered_df)
     st.markdown('</div>', unsafe_allow_html=True)
 
 
@@ -428,16 +432,12 @@ st.markdown('<div class="section-header">🔬 Relationships & Deep Dive</div>', 
 col_i, col_j = st.columns(2)
 with col_i:
     st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    fig = plot_scatter(filtered_df)
-    st.pyplot(fig, width="stretch")
-    plt.close(fig)
+    safe_chart(plot_scatter, filtered_df)
     st.markdown('</div>', unsafe_allow_html=True)
 
 with col_j:
     st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    fig = plot_heatmap(filtered_df)
-    st.pyplot(fig, width="stretch")
-    plt.close(fig)
+    safe_chart(plot_heatmap, filtered_df)
     st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("""
@@ -449,16 +449,12 @@ st.markdown("""
 col_k, col_l = st.columns(2)
 with col_k:
     st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    fig = plot_box(filtered_df)
-    st.pyplot(fig, width="stretch")
-    plt.close(fig)
+    safe_chart(plot_box, filtered_df)
     st.markdown('</div>', unsafe_allow_html=True)
 
 with col_l:
     st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    fig = plot_violin(filtered_df)
-    st.pyplot(fig, width="stretch")
-    plt.close(fig)
+    safe_chart(plot_violin, filtered_df)
     st.markdown('</div>', unsafe_allow_html=True)
 
 gc.collect()

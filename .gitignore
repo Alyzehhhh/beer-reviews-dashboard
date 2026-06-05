@@ -5,3 +5,6 @@ __pycache__/
 !data/
 .streamlit/secrets.toml
 data/beer_reviews.csv
+.git-credentials.env
+task.md
+.venv/

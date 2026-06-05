@@ -4,7 +4,10 @@ Vibrant glassmorphism design with shimmer accents.
 """
 
 import streamlit as st
+import pandas as pd
 import gc
+import io
+import streamlit.components.v1 as components
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -14,6 +17,7 @@ from charts import (
     plot_scatter, plot_box, plot_heatmap, plot_area_chart, plot_count,
     plot_violin, plot_stacked_bar, plot_donut,
 )
+import chartjs
 
 st.set_page_config(
     page_title="World Wide Beer Reviews",
@@ -186,6 +190,32 @@ st.markdown("""
         border: none; margin: 12px 0 28px 0; border-radius: 2px;
     }
 
+    /* ── Intro paragraph under title ── */
+    .intro-box {
+        max-width: 920px; margin: 6px auto 4px auto;
+        text-align: center;
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.97rem; line-height: 1.7;
+        color: var(--ink-soft);
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 143, 188, 0.22);
+        border-radius: 18px;
+        padding: 20px 32px;
+        box-shadow: 0 6px 22px rgba(242, 92, 151, 0.08);
+    }
+    .intro-box b { color: var(--pink-700); font-weight: 600; }
+
+    /* ── Section description (sits right under each section header) ── */
+    .section-desc {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.9rem; line-height: 1.6;
+        color: var(--ink-soft);
+        margin: -8px 0 18px 4px;
+        padding-left: 14px;
+        border-left: 3px solid var(--pink-300);
+    }
+
     .footer {
         text-align: center; padding: 30px; color: var(--ink-soft);
         font-size: 0.85rem; font-family: 'Poppins', sans-serif;
@@ -260,6 +290,13 @@ st.markdown("""
 <div class="dash-title animate-in">
     <h1>🍺 World Wide Beer Reviews</h1>
     <p>Exploring 1.5 million reviews from BeerAdvocate — aroma, appearance, palate, taste & beyond</p>
+</div>
+<div class="intro-box animate-in">
+    This interactive dashboard explores over <b>1.5 million beer reviews</b> from the BeerAdvocate
+    community, spanning <b>1998 to 2012</b>. Dive into how styles, breweries, alcohol content, and
+    sensory scores — aroma, appearance, palate, and taste — shape the overall rating of a beer.
+    Use the <b>sidebar filters</b> to slice the data by style, ABV, rating, and year, then explore the
+    charts, browse the raw reviews, and <b>download your filtered selection</b> at the bottom.
 </div>
 <div class="pink-divider"></div>
 """, unsafe_allow_html=True)
@@ -359,16 +396,24 @@ def safe_chart(plot_fn, data):
         st.info("Not enough data to render this chart for the current filters.")
 
 
+def safe_js(html_fn, data, height):
+    """Render an interactive Chart.js component, guarded against bad data."""
+    try:
+        html = html_fn(data, height=height - 80)
+        components.html(html, height=height, scrolling=False)
+    except Exception:
+        st.info("Not enough data to render this chart for the current filters.")
+
+
 # ══════════════════════════════════════════════════════════════════
 # SECTION 1: DISTRIBUTION & COMPOSITION
 # ══════════════════════════════════════════════════════════════════
 st.markdown('<div class="section-header">📊 Distribution & Composition</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-desc">How the reviews break down across beer styles and alcohol strength — which styles dominate and where the typical ABV lands.</div>', unsafe_allow_html=True)
 
 col_a, col_b = st.columns(2)
 with col_a:
-    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    safe_chart(plot_pie_chart, filtered_df)
-    st.markdown('</div>', unsafe_allow_html=True)
+    safe_js(chartjs.pie_html, filtered_df, 420)
 
 with col_b:
     st.markdown('<div class="chart-container">', unsafe_allow_html=True)
@@ -383,9 +428,7 @@ st.markdown("""
 
 col_c, col_d = st.columns(2)
 with col_c:
-    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    safe_chart(plot_histogram, filtered_df)
-    st.markdown('</div>', unsafe_allow_html=True)
+    safe_js(chartjs.histogram_html, filtered_df, 420)
 
 with col_d:
     st.markdown('<div class="chart-container">', unsafe_allow_html=True)
@@ -397,12 +440,11 @@ with col_d:
 # SECTION 2: TRENDS OVER TIME
 # ══════════════════════════════════════════════════════════════════
 st.markdown('<div class="section-header">📈 Trends Over Time</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-desc">Review volume and ratings tracked year by year, capturing the rise of the craft beer movement.</div>', unsafe_allow_html=True)
 
 col_e, col_f = st.columns(2)
 with col_e:
-    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    safe_chart(plot_line_chart, filtered_df)
-    st.markdown('</div>', unsafe_allow_html=True)
+    safe_js(chartjs.line_html, filtered_df, 420)
 
 with col_f:
     st.markdown('<div class="chart-container">', unsafe_allow_html=True)
@@ -421,17 +463,23 @@ gc.collect()
 # SECTION 3: RATINGS & COMPARISONS
 # ══════════════════════════════════════════════════════════════════
 st.markdown('<div class="section-header">⭐ Ratings & Comparisons</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-desc">Comparing average scores across the top beer styles and how their rating components stack up.</div>', unsafe_allow_html=True)
 
 col_g, col_h = st.columns(2)
 with col_g:
-    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    safe_chart(plot_bar_chart, filtered_df)
-    st.markdown('</div>', unsafe_allow_html=True)
+    safe_js(chartjs.bar_html, filtered_df, 500)
 
 with col_h:
     st.markdown('<div class="chart-container">', unsafe_allow_html=True)
     safe_chart(plot_stacked_bar, filtered_df)
     st.markdown('</div>', unsafe_allow_html=True)
+
+col_g2, col_h2 = st.columns(2)
+with col_g2:
+    safe_js(chartjs.bubble_html, filtered_df, 460)
+
+with col_h2:
+    safe_js(chartjs.funnel_html, filtered_df, 460)
 
 
 gc.collect()
@@ -439,6 +487,7 @@ gc.collect()
 # SECTION 4: RELATIONSHIPS & DEEP DIVE
 # ══════════════════════════════════════════════════════════════════
 st.markdown('<div class="section-header">🔬 Relationships & Deep Dive</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-desc">Correlations between sensory scores and the overall rating — what really drives how people score a beer.</div>', unsafe_allow_html=True)
 
 col_i, col_j = st.columns(2)
 with col_i:
@@ -475,6 +524,7 @@ gc.collect()
 # SECTION 6: DATA SHEET (compact)
 # ══════════════════════════════════════════════════════════════════
 st.markdown('<div class="section-header">📋 Data Sheet</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-desc">Browse the raw reviews behind the charts, then download your current filtered selection as CSV or Excel.</div>', unsafe_allow_html=True)
 
 _col_map = {
     "beer_name": "Beer",
@@ -511,11 +561,44 @@ st.dataframe(
 st.markdown('</div>', unsafe_allow_html=True)
 
 
+# ── Download (filtered data: CSV + Excel) ─────────────────────────
+@st.cache_data(show_spinner=False)
+def _to_csv(df_in):
+    return df_in.to_csv(index=False).encode("utf-8")
+
+@st.cache_data(show_spinner=False)
+def _to_excel(df_in):
+    buf = io.BytesIO()
+    with pd.ExcelWriter(buf, engine="xlsxwriter") as writer:
+        df_in.to_excel(writer, index=False, sheet_name="Beer Reviews")
+    return buf.getvalue()
+
+_export = filtered_df[avail].rename(columns={c: _col_map[c] for c in avail}).reset_index(drop=True)
+
+dl1, dl2, _sp = st.columns([1, 1, 3])
+with dl1:
+    st.download_button(
+        label=f"⬇️  Download CSV ({len(_export):,} rows)",
+        data=_to_csv(_export),
+        file_name="beer_reviews_filtered.csv",
+        mime="text/csv",
+        width="stretch",
+    )
+with dl2:
+    st.download_button(
+        label="⬇️  Download Excel",
+        data=_to_excel(_export),
+        file_name="beer_reviews_filtered.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        width="stretch",
+    )
+
+
 # ── Footer ────────────────────────────────────────────────────────
 st.markdown('<div class="pink-divider"></div>', unsafe_allow_html=True)
 st.markdown("""
 <div class="footer">
-    🍺 World Wide Beer Reviews Dashboard &nbsp;|&nbsp; Built with Python, Streamlit, Matplotlib & Seaborn<br>
+    🍺 World Wide Beer Reviews Dashboard &nbsp;|&nbsp; Built with Python, Streamlit, Matplotlib, Seaborn & Chart.js<br>
     Data Source: BeerAdvocate (1.5M Reviews)
 </div>
 """, unsafe_allow_html=True)

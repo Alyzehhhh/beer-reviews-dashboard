@@ -113,19 +113,12 @@ def setup_sidebar_filters(df):
     min_year = int(df["review_year"].min())
     max_year = int(df["review_year"].max())
 
-    # Default values for every filter widget
-    defaults = {
-        "filter_year": (min_year, max_year),
-        "filter_style": "All Styles",
-        "filter_abv": (0.0, 30.0),
-        "filter_breweries": [],
-        "filter_search": "",
-    }
-
-    # Seed session_state once so widgets read from it (no value=/default= conflict)
-    for k, v in defaults.items():
-        if k not in st.session_state:
-            st.session_state[k] = v
+    # A "nonce" appended to every widget key. Bumping it on reset forces
+    # Streamlit to mount brand-new widgets that fall back to their defaults —
+    # this also fixes the selectbox label not repainting after a reset.
+    if "filter_nonce" not in st.session_state:
+        st.session_state["filter_nonce"] = 0
+    n = st.session_state["filter_nonce"]
 
     st.sidebar.markdown(
         '<div style="text-align:center;padding:10px 0 20px 0;">'
@@ -135,12 +128,13 @@ def setup_sidebar_filters(df):
         unsafe_allow_html=True,
     )
 
-    # Reset: assign defaults to session_state BEFORE widgets are instantiated
-    # this run, so the new values take effect immediately. Doing this inside an
-    # on_click callback avoids the "cannot be modified after instantiation" error.
+    # Reset: drop any existing filter widget state and bump the nonce so the
+    # widgets below remount fresh with their default values (label included).
     def _reset_filters():
-        for k, v in defaults.items():
-            st.session_state[k] = v
+        for key in list(st.session_state.keys()):
+            if key.startswith("filter_") and key != "filter_nonce":
+                del st.session_state[key]
+        st.session_state["filter_nonce"] += 1
 
     st.sidebar.button(
         "🔄 Reset All Filters",
@@ -150,11 +144,12 @@ def setup_sidebar_filters(df):
 
     st.sidebar.markdown("---")
 
-    # 1. Year Range — value comes from session_state via key
+    # 1. Year Range
     year_range = st.sidebar.slider(
         "📅 Review Year Range",
         min_value=min_year, max_value=max_year,
-        key="filter_year",
+        value=(min_year, max_year),
+        key=f"filter_year_{n}",
     )
 
     st.sidebar.markdown("---")
@@ -164,7 +159,8 @@ def setup_sidebar_filters(df):
     selected_style = st.sidebar.selectbox(
         "🍻 Beer Style",
         options=["All Styles"] + all_styles,
-        key="filter_style",
+        index=0,
+        key=f"filter_style_{n}",
     )
 
     st.sidebar.markdown("---")
@@ -173,8 +169,8 @@ def setup_sidebar_filters(df):
     abv_range = st.sidebar.slider(
         "🔢 ABV Range (%)",
         min_value=0.0, max_value=30.0,
-        step=0.5,
-        key="filter_abv",
+        value=(0.0, 30.0), step=0.5,
+        key=f"filter_abv_{n}",
     )
 
     st.sidebar.markdown("---")
@@ -183,15 +179,16 @@ def setup_sidebar_filters(df):
     top_breweries = df["brewery_name"].value_counts().head(50).index.tolist()
     selected_breweries = st.sidebar.multiselect(
         "🏭 Breweries (Top 50)",
-        options=top_breweries,
-        key="filter_breweries",
+        options=top_breweries, default=[],
+        key=f"filter_breweries_{n}",
     )
 
     st.sidebar.markdown("---")
 
     # 5. Beer Name Search
     search_text = st.sidebar.text_input(
-        "🔍 Search Beer Name", key="filter_search",
+        "🔍 Search Beer Name", value="",
+        key=f"filter_search_{n}",
     )
 
     # ── Apply Filters ──

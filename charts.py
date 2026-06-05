@@ -11,6 +11,22 @@ import numpy as np
 import pandas as pd
 # plotly removed to save ~100MB RAM on free tier
 
+# ── High-DPI, crisp rendering for all figures ──
+# Higher DPI = sharper charts on retina / high-res displays. Anti-aliased
+# lines + text and a clean default font keep everything professional.
+matplotlib.rcParams.update({
+    "figure.dpi": 150,            # render resolution (crisp)
+    "savefig.dpi": 150,
+    "figure.autolayout": False,   # we call tight_layout per chart
+    "font.family": "DejaVu Sans",
+    "axes.titleweight": "bold",
+    "axes.linewidth": 0.8,
+    "lines.antialiased": True,
+    "patch.antialiased": True,
+    "text.antialiased": True,
+    "agg.path.chunksize": 10000,
+})
+
 # ── Glossy Vibrant Palette ──
 C1 = "#FF4D8D"   # hot pink
 C2 = "#FF85A2"   # rose

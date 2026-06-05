@@ -342,7 +342,8 @@ def safe_chart(plot_fn, data):
     """Render a chart, but never let one broken chart crash the whole page."""
     try:
         fig = plot_fn(data)
-        st.pyplot(fig, width="stretch")
+        fig.set_dpi(150)  # crisp, high-resolution rendering
+        st.pyplot(fig, width="stretch", dpi=150)
         plt.close(fig)
     except Exception:
         st.info("Not enough data to render this chart for the current filters.")

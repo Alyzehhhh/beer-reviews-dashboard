@@ -298,9 +298,9 @@ st.markdown("""
         10%  { opacity: 0.8; }
         100% { transform: translateY(105vh) translateX(60px) rotate(360deg); opacity: 0; }
     }
-    .stApp { position: relative; }
-    /* keep app content above petals */
-    .main, section.main, [data-testid="stMain"] { position: relative; z-index: 1; }
+    /* keep app content above the petals without changing Streamlit's layout flow */
+    [data-testid="stMain"] > div,
+    [data-testid="stAppViewContainer"] .block-container { position: relative; z-index: 1; }
 
     /* ── Data Sheet — pink table ── */
     div[data-testid="stDataFrame"] {

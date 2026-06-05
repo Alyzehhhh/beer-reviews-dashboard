@@ -441,14 +441,37 @@ if len(filtered_df) < 5:
     )
     st.stop()
 
+# Lightweight signature of the current filtered data — used as a cache key so
+# charts only re-render when the data actually changes (not on every rerun).
+_data_sig = (
+    len(filtered_df),
+    int(filtered_df["review_overall"].sum() * 100),
+    int(filtered_df["beer_abv"].sum() * 100),
+    filtered_df["beer_style"].nunique(),
+)
+
+
+# Registry so the cache can look charts up by a stable string name.
+_CHART_FNS = {
+    "donut": plot_donut, "count": plot_count, "area": plot_area_chart,
+    "stacked": plot_stacked_bar, "scatter": plot_scatter, "heatmap": plot_heatmap,
+    "box": plot_box, "violin": plot_violin,
+}
+_FN_TO_NAME = {fn: name for name, fn in _CHART_FNS.items()}
+
 
 def safe_chart(plot_fn, data):
-    """Render a chart, but never let one broken chart crash the whole page."""
+    """Render a matplotlib chart as cached PNG bytes (fast on reruns)."""
+    name = _FN_TO_NAME.get(plot_fn)
     try:
-        fig = plot_fn(data)
-        fig.set_dpi(150)  # crisp, high-resolution rendering
-        st.pyplot(fig, width="stretch", dpi=150)
-        plt.close(fig)
+        if name is not None:
+            png = cached_fig_png(name, data, _data_sig)
+            st.image(png, width="stretch")
+        else:
+            fig = plot_fn(data)
+            fig.set_dpi(100)
+            st.pyplot(fig, width="stretch", dpi=100)
+            plt.close(fig)
     except Exception:
         st.info("Not enough data to render this chart for the current filters.")
 
@@ -460,6 +483,20 @@ def safe_js(html_fn, data, height):
         components.html(html, height=height, scrolling=False)
     except Exception:
         st.info("Not enough data to render this chart for the current filters.")
+
+
+@st.cache_data(show_spinner=False, max_entries=64)
+def cached_fig_png(plot_name, _data, sig):
+    """Render a matplotlib chart once to PNG bytes and cache it.
+    `sig` is a lightweight signature of the filtered data so the cache
+    invalidates only when the data actually changes (not on every rerun)."""
+    import io as _io
+    fig = _CHART_FNS[plot_name](_data)
+    fig.set_dpi(100)
+    buf = _io.BytesIO()
+    fig.savefig(buf, format="png", dpi=100, bbox_inches="tight", facecolor=fig.get_facecolor())
+    plt.close(fig)
+    return buf.getvalue()
 
 
 # ══════════════════════════════════════════════════════════════════

@@ -15,8 +15,8 @@ import pandas as pd
 # Higher DPI = sharper charts on retina / high-res displays. Anti-aliased
 # lines + text and a clean default font keep everything professional.
 matplotlib.rcParams.update({
-    "figure.dpi": 150,            # render resolution (crisp)
-    "savefig.dpi": 150,
+    "figure.dpi": 100,            # render resolution (balanced for speed)
+    "savefig.dpi": 100,
     "figure.autolayout": False,   # we call tight_layout per chart
     "font.family": "DejaVu Sans",
     "axes.titleweight": "bold",

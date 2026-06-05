@@ -27,163 +27,167 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Poppins:wght@300;400;500;600&display=swap');
 
-    /* ── Animated gradient background ── */
-    .stApp {
-        background: linear-gradient(135deg, #FDF2F8 0%, #FAF5FF 25%, #EFF6FF 50%, #FDF2F8 75%, #FCE7F3 100%);
-        background-size: 400% 400%;
-        animation: bgShift 20s ease infinite;
-        font-family: 'Poppins', sans-serif;
-    }
-    @keyframes bgShift {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+    /* ============ ALL BABY-PINK THEME ============ */
+    :root {
+        --pink-50:  #FFF5FA;
+        --pink-100: #FFE6F2;
+        --pink-200: #FFD1E5;
+        --pink-300: #FFB6D4;
+        --pink-400: #FF8FBC;
+        --pink-500: #FF6FA8;
+        --pink-600: #F25C97;
+        --pink-700: #D84B82;
+        --ink:      #6B3A52;
+        --ink-soft: #A56B86;
     }
 
-    /* ── Sidebar — frosted glass ── */
+    /* ── Soft baby-pink background (no gradient color shift, just pink) ── */
+    .stApp {
+        background: #FFF0F7;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* ── Sidebar — soft pink frosted ── */
     section[data-testid="stSidebar"] {
-        background: rgba(255, 240, 250, 0.85) !important;
-        backdrop-filter: blur(20px);
-        border-right: 1px solid rgba(255, 77, 141, 0.15);
+        background: rgba(255, 230, 242, 0.92) !important;
+        backdrop-filter: blur(18px);
+        border-right: 1px solid rgba(255, 143, 188, 0.25);
     }
     section[data-testid="stSidebar"] label {
-        color: #4A3060 !important;
-        font-weight: 500;
+        color: var(--ink) !important;
+        font-weight: 600;
     }
+    section[data-testid="stSidebar"] h2 { color: var(--pink-600) !important; }
 
     h1, h2, h3 {
         font-family: 'Playfair Display', serif !important;
-        color: #2D2040 !important;
+        color: var(--ink) !important;
     }
+    .stMarkdown { color: var(--ink); }
 
-    /* ── KPI Cards — glassmorphism ── */
+    /* ── KPI Cards — soft pink, glossy, premium ── */
     .kpi-card {
-        background: rgba(255, 255, 255, 0.6);
-        backdrop-filter: blur(16px);
-        border-radius: 20px;
-        padding: 20px 14px;
+        background: linear-gradient(160deg, #FFFFFF 0%, #FFEAF4 100%);
+        border-radius: 22px;
+        padding: 22px 14px;
         text-align: center;
-        border: 1px solid rgba(255, 77, 141, 0.15);
-        box-shadow: 0 8px 32px rgba(167, 85, 247, 0.08), inset 0 1px 0 rgba(255,255,255,0.8);
-        transition: all 0.4s cubic-bezier(.4,0,.2,1);
-        min-height: 120px;
+        border: 1px solid rgba(255, 143, 188, 0.30);
+        box-shadow: 0 10px 30px rgba(242, 92, 151, 0.12),
+                    inset 0 1px 0 rgba(255,255,255,0.9);
+        transition: all 0.35s cubic-bezier(.4,0,.2,1);
+        min-height: 130px;
         display: flex; flex-direction: column; justify-content: center; align-items: center;
-        position: relative;
-        overflow: hidden;
+        position: relative; overflow: hidden;
+    }
+    .kpi-card::after {
+        content: '';
+        position: absolute; inset: 0 0 auto 0; height: 4px;
+        background: linear-gradient(90deg, var(--pink-300), var(--pink-500), var(--pink-300));
     }
     .kpi-card::before {
         content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.3) 50%, transparent 60%);
-        animation: shimmer 4s ease-in-out infinite;
+        position: absolute; top: -50%; left: -50%;
+        width: 200%; height: 200%;
+        background: linear-gradient(45deg, transparent 42%, rgba(255,255,255,0.45) 50%, transparent 58%);
+        animation: shimmer 5s ease-in-out infinite;
     }
     @keyframes shimmer {
         0%, 100% { transform: translateX(-100%) rotate(45deg); }
         50% { transform: translateX(100%) rotate(45deg); }
     }
     .kpi-card:hover {
-        transform: translateY(-6px) scale(1.02);
-        box-shadow: 0 16px 48px rgba(167, 85, 247, 0.15), inset 0 1px 0 rgba(255,255,255,0.9);
+        transform: translateY(-7px) scale(1.025);
+        box-shadow: 0 18px 44px rgba(242, 92, 151, 0.22), inset 0 1px 0 rgba(255,255,255,1);
     }
     .kpi-number {
         font-family: 'Playfair Display', serif;
-        font-size: 1.8rem; font-weight: 900;
-        background: linear-gradient(135deg, #FF4D8D, #A855F7);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        font-size: 1.9rem; font-weight: 900;
+        background: linear-gradient(135deg, var(--pink-500), var(--pink-700));
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         background-clip: text;
-        margin: 4px 0 2px 0; line-height: 1.2; white-space: nowrap;
+        margin: 6px 0 2px 0; line-height: 1.2; white-space: nowrap;
         position: relative; z-index: 1;
     }
     .kpi-label {
         font-family: 'Poppins', sans-serif;
-        font-size: 0.7rem; color: #8B7AA0;
+        font-size: 0.7rem; color: var(--ink-soft);
         font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px;
         position: relative; z-index: 1;
     }
     .kpi-icon {
-        font-size: 1.6rem; margin-bottom: 4px;
+        font-size: 1.7rem; margin-bottom: 2px;
         position: relative; z-index: 1;
     }
 
-    /* ── KPI Variants ── */
-    div.kpi-number.kpi-cyan {
-        background: linear-gradient(135deg, #36D1DC, #5B86E5) !important;
+    /* ── KPI Variants — ALL pink shades (cohesive) ── */
+    div.kpi-number.kpi-cyan,
+    div.kpi-number.kpi-gold,
+    div.kpi-number.kpi-emerald,
+    div.kpi-number.kpi-purple {
+        background: linear-gradient(135deg, var(--pink-400), var(--pink-600)) !important;
         -webkit-background-clip: text !important; background-clip: text !important;
         -webkit-text-fill-color: transparent !important;
     }
     div.kpi-number.kpi-gold {
-        background: linear-gradient(135deg, #F7971E, #FFD200) !important;
-        -webkit-background-clip: text !important; background-clip: text !important;
-        -webkit-text-fill-color: transparent !important;
-    }
-    div.kpi-number.kpi-emerald {
-        background: linear-gradient(135deg, #34D399, #059669) !important;
-        -webkit-background-clip: text !important; background-clip: text !important;
-        -webkit-text-fill-color: transparent !important;
-    }
-    div.kpi-number.kpi-purple {
-        background: linear-gradient(135deg, #A855F7, #7C3AED) !important;
+        background: linear-gradient(135deg, var(--pink-500), var(--pink-700)) !important;
         -webkit-background-clip: text !important; background-clip: text !important;
         -webkit-text-fill-color: transparent !important;
     }
 
-    /* ── Chart Containers — glass cards ── */
+    /* ── Chart Containers — clean white-pink panels ── */
     .chart-container {
-        background: rgba(255, 255, 255, 0.65);
-        backdrop-filter: blur(12px);
-        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        border-radius: 22px;
         padding: 22px;
         margin: 10px 0;
-        border: 1px solid rgba(255, 77, 141, 0.1);
-        box-shadow: 0 4px 24px rgba(167, 85, 247, 0.06);
-        transition: box-shadow 0.3s ease;
+        border: 1px solid rgba(255, 143, 188, 0.22);
+        box-shadow: 0 6px 26px rgba(242, 92, 151, 0.10);
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
     }
     .chart-container:hover {
-        box-shadow: 0 8px 40px rgba(167, 85, 247, 0.12);
+        box-shadow: 0 12px 42px rgba(242, 92, 151, 0.18);
+        transform: translateY(-2px);
     }
 
-    /* ── Section Headers — gradient pill ── */
+    /* ── Section Headers — pink pill with left accent ── */
     .section-header {
-        background: linear-gradient(135deg, #FF4D8D 0%, #A855F7 50%, #5B86E5 100%);
+        background: linear-gradient(135deg, var(--pink-500) 0%, var(--pink-700) 100%);
         color: white !important;
         padding: 14px 28px;
         border-radius: 16px;
         font-family: 'Playfair Display', serif;
-        font-size: 1.3rem; font-weight: 700;
-        margin: 35px 0 20px 0;
-        box-shadow: 0 6px 20px rgba(168, 85, 247, 0.3);
+        font-size: 1.35rem; font-weight: 700;
+        margin: 38px 0 20px 0;
+        box-shadow: 0 8px 22px rgba(216, 75, 130, 0.30);
         letter-spacing: 0.5px;
+        border-left: 6px solid #FFD1E5;
     }
 
     /* ── Title ── */
-    .dash-title { text-align: center; padding: 28px 20px 12px 20px; }
+    .dash-title { text-align: center; padding: 30px 20px 12px 20px; }
     .dash-title h1 {
         font-family: 'Playfair Display', serif !important;
-        font-size: 2.8rem !important; font-weight: 900 !important;
-        background: linear-gradient(135deg, #FF4D8D, #A855F7, #36D1DC) !important;
+        font-size: 2.9rem !important; font-weight: 900 !important;
+        background: linear-gradient(135deg, var(--pink-400), var(--pink-600), var(--pink-700)) !important;
         -webkit-background-clip: text !important;
         -webkit-text-fill-color: transparent !important;
         background-clip: text !important;
         margin-bottom: 5px !important;
     }
     .dash-title p {
-        font-family: 'Poppins', sans-serif; color: #8B7AA0;
+        font-family: 'Poppins', sans-serif; color: var(--ink-soft);
         font-size: 1rem; margin-top: 0;
     }
 
     .pink-divider {
         height: 3px;
-        background: linear-gradient(90deg, transparent, #FF4D8D, #A855F7, #36D1DC, transparent);
+        background: linear-gradient(90deg, transparent, var(--pink-300), var(--pink-500), var(--pink-300), transparent);
         border: none; margin: 12px 0 28px 0; border-radius: 2px;
     }
 
     .footer {
-        text-align: center; padding: 30px; color: #bbb;
+        text-align: center; padding: 30px; color: var(--ink-soft);
         font-size: 0.85rem; font-family: 'Poppins', sans-serif;
     }
 
@@ -193,40 +197,46 @@ st.markdown("""
     }
     .animate-in { animation: fadeInUp 0.6s ease-out forwards; }
 
-    .stMarkdown { color: #2D2040; }
     .stButton > button {
-        background: linear-gradient(135deg, #FF4D8D, #A855F7) !important;
+        background: linear-gradient(135deg, var(--pink-500), var(--pink-700)) !important;
         color: white !important; border: none !important;
         border-radius: 14px !important; font-weight: 600 !important;
-        padding: 8px 22px !important;
-        box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3) !important;
+        padding: 9px 22px !important;
+        box-shadow: 0 5px 16px rgba(216, 75, 130, 0.30) !important;
+        transition: all 0.25s ease !important;
     }
     .stButton > button:hover {
-        box-shadow: 0 6px 25px rgba(168, 85, 247, 0.5) !important;
-        transform: translateY(-1px);
+        box-shadow: 0 8px 26px rgba(216, 75, 130, 0.45) !important;
+        transform: translateY(-2px);
+    }
+
+    /* Sidebar widget accents -> pink */
+    section[data-testid="stSidebar"] [data-baseweb="slider"] [role="slider"] { background: var(--pink-600) !important; }
+    section[data-testid="stSidebar"] [data-baseweb="tag"] {
+        background: var(--pink-500) !important; color: #fff !important;
     }
 
     .insight-box {
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(10px);
-        border-left: 4px solid;
-        border-image: linear-gradient(180deg, #FF4D8D, #A855F7) 1;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(8px);
+        border-left: 5px solid var(--pink-500);
         border-radius: 0 14px 14px 0;
         padding: 14px 20px; margin: 14px 0;
-        font-size: 0.9rem; color: #4A3060;
+        font-size: 0.92rem; color: var(--ink);
+        box-shadow: 0 3px 14px rgba(242, 92, 151, 0.08);
     }
 
-    /* ── Data Sheet — glass table ── */
+    /* ── Data Sheet — pink table ── */
     div[data-testid="stDataFrame"] {
-        border: 1px solid rgba(168, 85, 247, 0.15) !important;
+        border: 1px solid rgba(255, 143, 188, 0.28) !important;
         border-radius: 16px !important;
         overflow: hidden;
-        box-shadow: 0 4px 20px rgba(168, 85, 247, 0.06);
+        box-shadow: 0 4px 20px rgba(242, 92, 151, 0.08);
     }
     div[data-testid="stDataFrame"] th,
     div[data-testid="stDataFrame"] [role="columnheader"] {
-        background: linear-gradient(135deg, #FCE7F3, #FAF5FF) !important;
-        color: #7C3AED !important;
+        background: linear-gradient(135deg, var(--pink-100), var(--pink-200)) !important;
+        color: var(--pink-700) !important;
         font-family: 'Poppins', sans-serif !important;
         font-weight: 600 !important;
         font-size: 0.82rem !important;
@@ -235,7 +245,7 @@ st.markdown("""
     div[data-testid="stDataFrame"] [role="gridcell"] {
         font-family: 'Poppins', sans-serif !important;
         font-size: 0.8rem !important;
-        color: #2D2040 !important;
+        color: var(--ink) !important;
     }
 </style>
 """, unsafe_allow_html=True)

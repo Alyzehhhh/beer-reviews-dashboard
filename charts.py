@@ -27,22 +27,27 @@ matplotlib.rcParams.update({
     "agg.path.chunksize": 10000,
 })
 
-# ── Glossy Vibrant Palette ──
-C1 = "#FF4D8D"   # hot pink
-C2 = "#FF85A2"   # rose
-C3 = "#36D1DC"   # cyan shimmer
-C4 = "#5B86E5"   # electric blue
-C5 = "#F7971E"   # golden amber
-C6 = "#A855F7"   # vivid purple
-C7 = "#34D399"   # emerald
-C8 = "#FB7185"   # coral
-C9 = "#FBBF24"   # gold
-C10 = "#6EE7B7"  # mint
+# ── All Baby-Pink Palette ──
+C1 = "#FF6FA8"   # pink (primary)
+C2 = "#FF8FBC"   # soft pink
+C3 = "#FFB6D4"   # baby pink
+C4 = "#F25C97"   # deep rose
+C5 = "#FFD1E5"   # blush
+C6 = "#D84B82"   # raspberry
+C7 = "#FFA6C9"   # cotton candy
+C8 = "#FF9DC0"   # carnation
+C9 = "#E86FA0"   # rose pink
+C10 = "#FFC2DD"  # petal
 
-COLORS = [C1, C3, C6, C5, C7, C4, C8, C9, C10, C2]
-BG = "#FEFAFF"
-TEXT = "#2D2040"
-GRID = "#F0E4F4"
+COLORS = [C1, C4, C2, C6, C7, C9, C3, C8, C5, C10]
+BG = "#FFFFFF"
+TEXT = "#6B3A52"
+GRID = "#FFD9EA"
+
+# Shared all-pink colormap (light blush -> deep raspberry)
+PINK_CMAP = mcolors.LinearSegmentedColormap.from_list(
+    "babypink", ["#FFE6F2", "#FFB6D4", "#FF6FA8", "#D84B82"]
+)
 
 # Gradient helper for bar fills
 def _gradient_bars(ax, bars, color_start, color_end):
@@ -87,7 +92,7 @@ def plot_histogram(df):
     n, bins, patches = ax.hist(df["review_overall"].dropna(), bins=20,
                                 edgecolor="white", linewidth=1.2, alpha=0.9)
     # Gradient coloring across bins
-    cm = plt.cm.get_cmap("PuRd")
+    cm = PINK_CMAP
     for i, p in enumerate(patches):
         p.set_facecolor(cm(0.3 + 0.6 * i / len(patches)))
     ax.set_xlabel("Overall Rating", fontsize=11, color=TEXT)
@@ -142,7 +147,7 @@ def plot_scatter(df):
     s = df.sample(n=min(800, len(df)), random_state=42)
     fig, ax = plt.subplots(figsize=(8, 5))
     sc = ax.scatter(s["beer_abv"], s["review_overall"], c=s["review_taste"],
-                    cmap="cool", alpha=0.55, s=18, edgecolors="white", linewidths=0.3)
+                    cmap=PINK_CMAP, alpha=0.55, s=18, edgecolors="white", linewidths=0.3)
     cbar = plt.colorbar(sc, ax=ax, pad=0.02)
     cbar.set_label("Taste Rating", color=TEXT, fontsize=10)
     ax.set_xlabel("ABV (%)", fontsize=11, color=TEXT)
@@ -178,7 +183,7 @@ def plot_heatmap(df):
     corr = df[cols].corr()
     fig, ax = plt.subplots(figsize=(7, 6))
     mask = np.triu(np.ones_like(corr, dtype=bool))
-    sns.heatmap(corr, annot=True, fmt=".2f", cmap="PuRd", mask=mask,
+    sns.heatmap(corr, annot=True, fmt=".2f", cmap=PINK_CMAP, mask=mask,
                 linewidths=2.5, linecolor="white", ax=ax,
                 annot_kws={"size": 11, "color": TEXT, "fontweight": "bold"},
                 cbar_kws={"shrink": 0.8})
@@ -270,7 +275,7 @@ def plot_bubble(df):
     sizes = (brew["beers"] / brew["beers"].max() * 400).clip(lower=20)
     scatter = ax.scatter(
         brew["avg"], brew["cnt"], s=sizes, c=brew["avg"],
-        cmap=mcolors.LinearSegmentedColormap.from_list("", ["#36D1DC", "#FF4D8D", "#A855F7"]),
+        cmap=PINK_CMAP,
         alpha=0.75, edgecolors="white", linewidth=0.8,
     )
     ax.set_xlabel("Average Rating", color=TEXT, fontfamily="serif")

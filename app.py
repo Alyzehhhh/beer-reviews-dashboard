@@ -29,7 +29,7 @@ st.set_page_config(
 # ── CSS — Glassmorphism + Shimmer ─────────────────────────────────
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Poppins:wght@300;400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Poppins:wght@300;400;500;600&family=Pacifico&family=Quicksand:wght@500;600;700&display=swap');
 
     /* ============ ALL BABY-PINK THEME ============ */
     :root {
@@ -154,7 +154,7 @@ st.markdown("""
         transform: translateY(-2px);
     }
 
-    /* ── Section Headers — pink pill with left accent ── */
+    /* ── Section Headers — pink pill with flower accents ── */
     .section-header {
         background: linear-gradient(135deg, var(--pink-500) 0%, var(--pink-700) 100%);
         color: white !important;
@@ -166,19 +166,33 @@ st.markdown("""
         box-shadow: 0 8px 22px rgba(216, 75, 130, 0.30);
         letter-spacing: 0.5px;
         border-left: 6px solid #FFD1E5;
+        position: relative; overflow: visible;
+    }
+    .section-header::after {
+        content: "🌸";
+        position: absolute; right: 18px; top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.4rem;
+        animation: sway 3.5s ease-in-out infinite;
     }
 
-    /* ── Title ── */
-    .dash-title { text-align: center; padding: 30px 20px 12px 20px; }
+    /* ── Title — cute handwritten font ── */
+    .dash-title { text-align: center; padding: 30px 20px 12px 20px; position: relative; }
     .dash-title h1 {
-        font-family: 'Playfair Display', serif !important;
-        font-size: 2.9rem !important; font-weight: 900 !important;
+        font-family: 'Pacifico', cursive !important;
+        font-size: 3.1rem !important; font-weight: 400 !important;
         background: linear-gradient(135deg, var(--pink-400), var(--pink-600), var(--pink-700)) !important;
         -webkit-background-clip: text !important;
         -webkit-text-fill-color: transparent !important;
         background-clip: text !important;
         margin-bottom: 5px !important;
+        letter-spacing: 0.5px;
+        text-shadow: 0 2px 14px rgba(242,92,151,0.12);
     }
+    /* sparkle/flower decorations beside the title */
+    .dash-title h1::before { content: "🌸"; -webkit-text-fill-color: initial; margin-right: 14px; font-size: 2rem; vertical-align: middle; animation: sway 3s ease-in-out infinite; display:inline-block; }
+    .dash-title h1::after  { content: "🌷"; -webkit-text-fill-color: initial; margin-left: 14px; font-size: 2rem; vertical-align: middle; animation: sway 3s ease-in-out infinite reverse; display:inline-block; }
+    @keyframes sway { 0%,100%{ transform: rotate(-10deg) translateY(0);} 50%{ transform: rotate(10deg) translateY(-4px);} }
     .dash-title p {
         font-family: 'Poppins', sans-serif; color: var(--ink-soft);
         font-size: 1rem; margin-top: 0;
@@ -188,6 +202,15 @@ st.markdown("""
         height: 3px;
         background: linear-gradient(90deg, transparent, var(--pink-300), var(--pink-500), var(--pink-300), transparent);
         border: none; margin: 12px 0 28px 0; border-radius: 2px;
+        position: relative;
+    }
+    /* flower in the middle of the divider */
+    .pink-divider::after {
+        content: "🌸";
+        position: absolute; left: 50%; top: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1.1rem;
+        background: #FFF0F7; padding: 0 10px;
     }
 
     /* ── Intro paragraph under title ── */
@@ -251,10 +274,33 @@ st.markdown("""
         backdrop-filter: blur(8px);
         border-left: 5px solid var(--pink-500);
         border-radius: 0 14px 14px 0;
-        padding: 14px 20px; margin: 14px 0;
+        padding: 14px 20px 14px 44px; margin: 14px 0;
         font-size: 0.92rem; color: var(--ink);
         box-shadow: 0 3px 14px rgba(242, 92, 151, 0.08);
+        position: relative;
     }
+    .insight-box::before {
+        content: "🌷";
+        position: absolute; left: 14px; top: 50%;
+        transform: translateY(-50%); font-size: 1.1rem;
+    }
+
+    /* ── Falling flower petals ── */
+    .petal {
+        position: fixed; top: -40px; z-index: 0;
+        pointer-events: none; user-select: none;
+        font-size: 18px; opacity: 0.75;
+        animation: fall linear infinite;
+        will-change: transform;
+    }
+    @keyframes fall {
+        0%   { transform: translateY(-40px) translateX(0) rotate(0deg); opacity: 0; }
+        10%  { opacity: 0.8; }
+        100% { transform: translateY(105vh) translateX(60px) rotate(360deg); opacity: 0; }
+    }
+    .stApp { position: relative; }
+    /* keep app content above petals */
+    .main, section.main, [data-testid="stMain"] { position: relative; z-index: 1; }
 
     /* ── Data Sheet — pink table ── */
     div[data-testid="stDataFrame"] {
@@ -287,6 +333,17 @@ filtered_df, filters_active = setup_sidebar_filters(df)
 
 # ── Header ────────────────────────────────────────────────────────
 st.markdown("""
+<div class="petal" style="left:5%;  animation-duration:11s; animation-delay:0s;">🌸</div>
+<div class="petal" style="left:15%; animation-duration:14s; animation-delay:2s;">🌷</div>
+<div class="petal" style="left:27%; animation-duration:9s;  animation-delay:1s;">🌸</div>
+<div class="petal" style="left:38%; animation-duration:13s; animation-delay:4s;">🌼</div>
+<div class="petal" style="left:50%; animation-duration:10s; animation-delay:0.5s;">🌸</div>
+<div class="petal" style="left:61%; animation-duration:15s; animation-delay:3s;">🌷</div>
+<div class="petal" style="left:72%; animation-duration:12s; animation-delay:1.5s;">🌸</div>
+<div class="petal" style="left:83%; animation-duration:9.5s;animation-delay:2.5s;">🌼</div>
+<div class="petal" style="left:92%; animation-duration:13.5s;animation-delay:0.8s;">🌸</div>
+<div class="petal" style="left:46%; animation-duration:16s; animation-delay:5s;">🌷</div>
+
 <div class="dash-title animate-in">
     <h1>🍺 World Wide Beer Reviews</h1>
     <p>Exploring 1.5 million reviews from BeerAdvocate — aroma, appearance, palate, taste & beyond</p>

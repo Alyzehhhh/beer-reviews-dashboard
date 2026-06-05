@@ -59,7 +59,59 @@ def _shell(canvas_id, config_js, height=360, extra_js=""):
   const cfg={config_js};
   document.querySelector('.ctitle').textContent=cfg.__title||'';
   delete cfg.__title;
+
+  // ── Click interactions: re-animate the whole chart + pulse/glow the clicked element ──
+  cfg.options = cfg.options || {{}};
+  const _userOnClick = cfg.options.onClick;
+  cfg.options.onClick = function(evt, elements, chartInstance){{
+    // 1) re-run the entry animation (redraw)
+    chartInstance.reset();
+    chartInstance.update();
+    // 2) pulse + glow the clicked slice/bar/point
+    if(elements && elements.length){{
+      const el = elements[0];
+      const ds = chartInstance.data.datasets[el.datasetIndex];
+      const idx = el.index;
+      const orig = Array.isArray(ds.backgroundColor) ? ds.backgroundColor[idx] : ds.backgroundColor;
+      ctx.style.transition = "filter .18s ease, transform .18s ease";
+      ctx.style.filter = "drop-shadow(0 0 16px #FF6FA8) brightness(1.12)";
+      ctx.style.transform = "scale(1.015)";
+      // glow the element itself by temporarily boosting it
+      const setColor = (c)=>{{ if(Array.isArray(ds.backgroundColor)) ds.backgroundColor[idx]=c; else ds.backgroundColor=c; chartInstance.update('none'); }};
+      setColor("#FF3D86");
+      // little petal burst at the click point
+      petalBurst(evt.native ? evt.native.clientX : evt.x, evt.native ? evt.native.clientY : evt.y);
+      setTimeout(()=>{{
+        ctx.style.filter=""; ctx.style.transform="";
+        setColor(orig);
+      }}, 650);
+    }}
+    if(typeof _userOnClick === 'function') _userOnClick(evt, elements, chartInstance);
+  }};
+
+  // sparkle/petal burst helper
+  function petalBurst(x, y){{
+    if(x==null||y==null) return;
+    const flowers=["🌸","🌷","✨","💖","🌼"];
+    for(let i=0;i<7;i++){{
+      const s=document.createElement('div');
+      s.textContent=flowers[Math.floor(Math.random()*flowers.length)];
+      s.style.cssText="position:fixed;left:"+x+"px;top:"+y+"px;font-size:16px;pointer-events:none;z-index:9999;transition:all .8s cubic-bezier(.2,.8,.3,1);opacity:1;";
+      document.body.appendChild(s);
+      const ang=Math.random()*Math.PI*2, dist=40+Math.random()*55;
+      requestAnimationFrame(()=>{{
+        s.style.left=(x+Math.cos(ang)*dist)+"px";
+        s.style.top=(y+Math.sin(ang)*dist)+"px";
+        s.style.opacity="0";
+        s.style.transform="rotate("+(Math.random()*360)+"deg) scale(0.6)";
+      }});
+      setTimeout(()=>s.remove(),850);
+    }}
+  }}
+
   const chart=new Chart(ctx,cfg);
+  // gentle hover cursor cue
+  ctx.style.cursor="pointer";
   {extra_js}
 </script>
 </body></html>"""
